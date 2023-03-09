@@ -78,7 +78,7 @@ Writing output/tcr/total_reads-vs-saturation-vdj.pdf
 ### ADT
 
 ```bash
-Rscript saturation.R --out output --file sample.stat.csv.gz
+Rscript saturation.R --out output --file Batch_1A_ADT.stat.csv.gz
 ```
 ```
 Reading Batch_1A_ADT.stat.csv.gz
