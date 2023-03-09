@@ -93,11 +93,11 @@ theme(
   plot.title       = element_text(size = 16),
   plot.title.position = "plot",
   plot.subtitle    = element_text(size = 16),
-  plot.caption     = element_text(size = 16),
+  plot.caption     = element_text(size = 14),
   strip.text       = element_text(size = 16),
   legend.text      = element_text(size = 16),
   legend.title     = element_text(size = 16),
-  axis.text        = element_text(size = 16),
+  axis.text        = element_text(size = 14),
   axis.title       = element_text(size = 16)
 )
 theme_set(theme_kamil)
@@ -139,7 +139,7 @@ if (!file.exists(opt$file)) {
 }
 file_base <- basename(opt$file)
 file_dir <- basename(dirname(opt$file))
-file_dir <- str_remove(file_dir, "^irHepatitis_")
+file_dir <- str_remove(file_dir, "^irHepatitis_") # TODO: Delete this line
 accepted_files <- c(
   "GEX" = "^molecule_info.h5$",
   "VDJ" = "^all_contig_annotations.csv$",
@@ -199,6 +199,7 @@ if (type == "GEX") {
   sat <- saturation(gex_reads, keep = keep)
   total_sat <- 1 - sum(gex_reads[keep] > 0) / sum(gex_reads[keep])
   sat_file <- file.path(opt$out, "saturation-gex.tsv")
+  status(glue("Writing {sat_file}"))
   fwrite(sat, sat_file, sep = "\t")
 
   my_caption <- glue("{signif(100 * total_sat, 2)}% saturation ({signif(mean(gex_reads[keep]), 2)} reads per UMI)")
@@ -246,6 +247,7 @@ if (type == "GEX") {
   sat <- saturation(d_vdj$reads, my_probs, keep = keep)
   total_sat <- 1 - sum(d_vdj$reads[keep] > 0) / sum(d_vdj$reads[keep])
   sat_file <- file.path(opt$out, "saturation-vdj.tsv")
+  status(glue("Writing {sat_file}"))
   fwrite(sat, sat_file, sep = "\t")
 
   my_caption <- glue("{signif(100 * total_sat, 2)}% saturation ({signif(mean(d_vdj$reads[keep]), 2)} reads per clonotype)")
@@ -287,6 +289,7 @@ if (type == "GEX") {
       )
     }))
     sat_cdr3_file <- file.path(opt$out, "saturation-pct_cdr3.tsv")
+    status(glue("Writing {sat_cdr3_file}"))
     fwrite(sat_cdr3, sat_cdr3_file, sep = "\t")
 
     p <- ggplot(sat_cdr3) +
@@ -341,6 +344,7 @@ if (type == "GEX") {
   status(glue("Estimating ADT saturation curve for {n_barcodes} barcodes"))
   sat <- saturation(d_adt$Count, keep = keep)
   sat_file <- file.path(opt$out, "saturation-adt.tsv")
+  status(glue("Writing {sat_file}"))
   fwrite(sat, sat_file, sep = "\t")
 
   my_caption <- glue("{signif(100 * total_sat, 2)}% saturation ({signif(mean(d_adt$Count[keep]), 2)} reads per UMI)")
@@ -370,7 +374,9 @@ if (type == "GEX") {
 
   feature_sat <- d_adt[keep, .(saturation = 1 - .N / sum(Count)), by = c("Feature")]
   feature_sat_file <- file.path(opt$out, "saturation-adt-feature.tsv")
+  status(glue("Writing {feature_sat_file}"))
   fwrite(feature_sat, feature_sat_file, sep = "\t")
+
   p <- ggplot(feature_sat) +
     aes(x = saturation) +
     geom_histogram(bins = 71) +

@@ -51,6 +51,7 @@ Rscript saturation.R --out output --file molecule_info.h5
 ```
 Reading molecule_info.h5
 Estimating GEX saturation for 519882 barcodes
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100%
 Writing output/saturation-gex.tsv
 Writing output/total_reads-vs-saturation-gex.pdf
 ```
@@ -67,7 +68,9 @@ Rscript saturation.R --out output/tcr --file all_contig_annotations.csv
 ```
 ```
 Reading all_contig_annotations.csv
+INFO: Removing '-1' from the end of each barcode
 Estimating VDJ saturation for 20233 barcodes
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100%
 Writing output/tcr/saturation-vdj.tsv
 Writing output/tcr/total_reads-vs-saturation-vdj.pdf
 ```
@@ -83,13 +86,16 @@ Rscript saturation.R --out output --file Batch_1A_ADT.stat.csv.gz
 ```
 ```
 Reading Batch_1A_ADT.stat.csv.gz
-Estimating ADT saturation
+Estimating ADT saturation curve for 729372 barcodes
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100%
 Writing output/saturation-adt.tsv
 Writing output/total_reads-vs-saturation-adt.pdf
 Writing output/saturation-adt-feature.tsv
 Writing output/histogram-saturation-adt-feature.pdf
 ```
+
 <p align="center">
 <img width="50%" src="https://user-images.githubusercontent.com/209714/224153734-6fe76c17-0aef-487c-8e3f-de70a1540c86.png">
 <img width="50%" src="https://user-images.githubusercontent.com/209714/224153888-63613f19-0840-4d79-8a2f-5ebca0ffafb3.png">
 </p>
+
