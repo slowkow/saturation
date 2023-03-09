@@ -1,7 +1,7 @@
 # saturation.R
 
 Here is an R script `saturation.R` for estimating sequencing saturation from a
-GEX, VDJ, or ADT dataset from the 10xgenomics platform.
+GEX, VDJ, or ADT dataset from the 10x Genomics platform.
 
 The script uses the binomial distribution to downsample the reads and estimate
 a saturation curve. This can be helpful to determine if a sequencing experiment
