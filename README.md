@@ -29,8 +29,6 @@ File formats:
 
 ## Getting started
 
-See [output](output) for an example of the output files.
-
 Install the dependencies:
 
 ```r
@@ -39,6 +37,9 @@ install.packages(
 )
 BiocManager::install("rhdf5")
 ```
+
+See [output](output) for an example of the output files.
+
 
 ## Usage examples
 
