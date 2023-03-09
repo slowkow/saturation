@@ -7,7 +7,7 @@ The script uses the binomial distribution to downsample the reads and estimate
 a saturation curve. This can be helpful to determine if a sequencing experiment
 has enough reads.
 
-[10xgenomics.com][1] gives us the formula for sequencing saturation:
+[10xgenomics.com][1] gives us this formula for sequencing saturation:
 
 ```
 Sequencing Saturation = 1 - (n_deduped_reads / n_reads)

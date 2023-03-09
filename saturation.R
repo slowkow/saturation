@@ -195,7 +195,7 @@ if (type == "GEX") {
   } else {
     keep <- seq_len(length(gex_reads))
   }
-  status(glue("Estimating GEX saturation for {length(unique(gex_barcodes[keep]))} barcodes"))
+  status(glue("Estimating GEX saturation curve for {length(unique(gex_barcodes[keep]))} barcodes"))
   sat <- saturation(gex_reads, keep = keep)
   total_sat <- 1 - sum(gex_reads[keep] > 0) / sum(gex_reads[keep])
   sat_file <- file.path(opt$out, "saturation-gex.tsv")
@@ -242,7 +242,7 @@ if (type == "GEX") {
   } else {
     keep <- seq_len(nrow(d_vdj))
   }
-  status(glue("Estimating VDJ saturation for {length(unique(d_vdj$barcode[keep]))} barcodes"))
+  status(glue("Estimating VDJ saturation curve for {length(unique(d_vdj$barcode[keep]))} barcodes"))
   sat <- saturation(d_vdj$reads, my_probs, keep = keep)
   total_sat <- 1 - sum(d_vdj$reads[keep] > 0) / sum(d_vdj$reads[keep])
   sat_file <- file.path(opt$out, "saturation-vdj.tsv")
@@ -274,7 +274,7 @@ if (type == "GEX") {
   ggsave(p_file, p, width = 4, height = 3)
 
   if (!is.null(barcodes)) {
-    status("Estimating VDJ pct_cdr3 saturation")
+    status("Estimating VDJ pct_cdr3 saturation curve")
 
     sat_cdr3 <- rbindlist(pblapply(my_probs, function(prob) {
       my_reads <- rbinom(n = nrow(d_vdj), size = d_vdj$reads, prob = prob)
@@ -324,9 +324,11 @@ if (type == "GEX") {
 
   if (!is.null(barcodes)) {
     keep <- which(d_adt$Barcode %in% barcodes)
-    status(glue("{length(unique(d_adt$Barcode[keep]))} ADT barcodes found in --barcodes"))
+    n_barcodes <- length(unique(d_adt$Barcode[keep]))
+    status(glue("{n_barcodes} ADT barcodes found in --barcodes"))
   } else {
     keep <- seq_len(nrow(d_adt))
+    n_barcodes <- length(unique(d_adt$Barcode))
   }
 
   if (length(keep) <= 1) {
@@ -336,7 +338,7 @@ if (type == "GEX") {
 
   total_sat <- 1 - length(keep) / sum(d_adt$Count[keep])
 
-  status(glue("Estimating ADT saturation"))
+  status(glue("Estimating ADT saturation curve for {n_barcodes} barcodes"))
   sat <- saturation(d_adt$Count, keep = keep)
   sat_file <- file.path(opt$out, "saturation-adt.tsv")
   fwrite(sat, sat_file, sep = "\t")
