@@ -248,7 +248,7 @@ if (type == "GEX") {
   sat_file <- file.path(opt$out, "saturation-vdj.tsv")
   fwrite(sat, sat_file, sep = "\t")
 
-  my_caption <- glue("{signif(100 * total_sat, 2)}% saturation ({signif(mean(d_vdj$reads[keep]), 2)} reads per UMI)")
+  my_caption <- glue("{signif(100 * total_sat, 2)}% saturation ({signif(mean(d_vdj$reads[keep]), 2)} reads per clonotype)")
   p <- ggplot(sat) +
     aes(x = total_reads, y = sat) +
     geom_hline(yintercept = total_sat, linewidth = 0.3, color = "red") +
