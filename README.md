@@ -1,5 +1,7 @@
 # saturation.R
 
+<a href="https://zenodo.org/badge/latestdoi/611932244"><img src="https://zenodo.org/badge/611932244.svg" alt="DOI"></a>
+
 Here is an R script `saturation.R` for estimating sequencing saturation from a
 GEX, VDJ, or ADT dataset from the 10x Genomics platform.
 
