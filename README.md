@@ -1,5 +1,7 @@
 # saturation.R
 
+<a href="https://zenodo.org/badge/latestdoi/611932244"><img src="https://zenodo.org/badge/611932244.svg" alt="DOI"></a>
+
 Here is an R script `saturation.R` for estimating sequencing saturation from a
 GEX, VDJ, or ADT dataset from the 10x Genomics platform.
 
@@ -57,7 +59,7 @@ Writing output/total_reads-vs-saturation-gex.pdf
 ```
 
 <p align="center">
-<img width="50%" src="https://user-images.githubusercontent.com/209714/224153589-ef7b1580-c29e-43e6-938a-d4d9e66af541.png">
+<img width="50%" src="https://user-images.githubusercontent.com/209714/224188198-19f808f7-cbe9-4c21-a88a-8bbf9eb4cec7.png">
 </p>
 
 
@@ -76,7 +78,7 @@ Writing output/tcr/total_reads-vs-saturation-vdj.pdf
 ```
 
 <p align="center">
-<img width="50%" src="https://user-images.githubusercontent.com/209714/224153652-933585f5-3e48-4a35-8514-cc2f3b7d339e.png">
+<img width="50%" src="https://user-images.githubusercontent.com/209714/224188379-cba4664a-cc5d-4f49-a03f-9496cf77522a.png">
 </p>
 
 ### ADT
@@ -95,10 +97,9 @@ Writing output/histogram-saturation-adt-feature.pdf
 ```
 
 <p align="center">
-<img width="50%" src="https://user-images.githubusercontent.com/209714/224153734-6fe76c17-0aef-487c-8e3f-de70a1540c86.png">
-<img width="50%" src="https://user-images.githubusercontent.com/209714/224153888-63613f19-0840-4d79-8a2f-5ebca0ffafb3.png">
+<img width="50%" src="https://user-images.githubusercontent.com/209714/224188298-b136b303-fcf1-4c73-a764-6e64ee178d0c.png">
+<img width="50%" src="https://user-images.githubusercontent.com/209714/224188339-428709d8-c885-4d28-85f1-16159b58821f.png">
 </p>
-
 
 ## Running parallel jobs with rush
 
@@ -108,9 +109,11 @@ Install [rush](https://github.com/shenwei356/rush) by Wei Shen:
 go install github.com/shenwei356/rush
 ```
 
-ls /projects/irae_blood/cellranger_output/*/{molecule_info.h5,all_contig_annotations.csv,*.stat.csv.gz} > files.txt
+Then make a list of input files and pass it to rush:
 
-rush -i files.txt -o rush-saturation.txt -j16 'Rscript saturation.R --out irae_blood/{/%} --file {}'
+```bash
+ls /project/cellranger_output/*/{molecule_info.h5,all_contig_annotations.csv,*.stat.csv.gz} > files.txt
 
-
+rush -i files.txt -o rush-saturation.txt -j16 'Rscript saturation.R --out out/{/%} --file {}'
+```
 
