@@ -1,6 +1,69 @@
 #!/usr/bin/env Rscript
 #
-# saturation.R
+# saturation.R v1.0.1 2023-03-16
+#
+# Usage
+# =====
+#
+# Here are some usage examples:
+#
+#   Rscript saturation.R --out outdir --file molecule_info.h5
+#   Rscript saturation.R --out outdir --file all_contig_annotations.csv
+#   Rscript saturation.R --out outdir --file all_contig_annotations.csv --barcodes barcodes.txt 
+#   Rscript saturation.R --out outdir --file sample.stat.csv.gz
+#
+# The input file must be one of:
+#
+#   molecule_info.h5            for GEX data
+#   all_contig_annotations.csv  for VDJ data
+#   *.stat.csv.gz               for ADT data
+#
+# The --barcodes file is optional. It does not make a big difference, so don't
+# worry if you don't have one. You need the --barcodes option to estimate what
+# percent of your barcodes have VDJ data.
+#
+#
+# Output
+# ======
+#
+# The following output files will be written.
+#
+# For GEX data:
+#
+#   saturation-gex.tsv
+#   total_reads-vs-saturation-gex.pdf
+#   
+# For VDJ data:
+#
+#   saturation-vdj.tsv
+#   total_reads-vs-saturation-vdj.pdf
+#
+# For VDJ data (with --barcodes):
+#
+#   saturation-vdj.tsv
+#   total_reads-vs-saturation-vdj.pdf
+#   saturation-pct_cdr3.tsv
+#   total_reads-vs-pct_cdr3.pdf
+#  
+# For ADT data:
+#
+#   saturation-adt.tsv
+#   saturation-adt-feature.tsv
+#   total_reads-vs-saturation-adt.pdf
+#   histogram-saturation-adt-feature.pdf
+#
+#
+# Dependencies
+# ============
+#
+# Install the dependencies:
+#
+#   install.packages(c("data.table", "ggplot2", "ggtext", "glue", "optparse", "pbapply", "scales", "stringr", "BiocManager"))
+#   BiocManager::install("rhdf5")
+#
+#
+# License
+# =======
 #
 # MIT License
 # 
@@ -24,51 +87,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-# Usage:
-#   Rscript saturation.R --out outdir --file molecule_info.h5
-#   Rscript saturation.R --out outdir --file all_contig_annotations.csv
-#   Rscript saturation.R --out outdir --file all_contig_annotations.csv --barcodes barcodes.txt 
-#   Rscript saturation.R --out outdir --file sample.stat.csv.gz
-#
-# The input file must be one of:
-#
-#   molecule_info.h5            for GEX data
-#   all_contig_annotations.csv  for VDJ data
-#   *.stat.csv.gz               for ADT data
-#
-# The --barcodes file is optional. It does not make a big difference, so don't
-# worry if you don't have one.
-#
-# The following output files will be written:
-#
-#   GEX
-#     saturation-gex.tsv
-#     total_reads-vs-saturation-gex.pdf
-#   
-#   VDJ
-#     saturation-vdj.tsv
-#     total_reads-vs-saturation-vdj.pdf
-#
-#   VDJ (with --barcodes)
-#     saturation-vdj.tsv
-#     total_reads-vs-saturation-vdj.pdf
-#     saturation-pct_cdr3.tsv
-#     total_reads-vs-pct_cdr3.pdf
-#   
-#   ADT
-#     saturation-adt.tsv
-#     saturation-adt-feature.tsv
-#     total_reads-vs-saturation-adt.pdf
-#     histogram-saturation-adt-feature.pdf
-#
-# Install the dependencies:
-#
-#   install.packages(c("data.table", "ggplot2", "glue", "optparse", "pbapply", "scales", "stringr", "BiocManager"))
-#   BiocManager::install("rhdf5")
 
 suppressMessages({
   library(data.table)
   library(ggplot2)
+  library(ggtext)
   library(glue)
   library(optparse)
   library(pbapply)
@@ -85,20 +108,21 @@ theme_kamil <- theme_classic(
   base_rect_size = 0.3
 ) +
 theme(
-  panel.spacing    = unit(2, "lines"),
-  panel.border     = element_rect(linewidth = 0.5, fill = NA),
-  axis.ticks       = element_line(linewidth = 0.4),
-  axis.line        = element_blank(),
-  strip.background = element_blank(),
-  plot.title       = element_text(size = 16),
-  plot.title.position = "plot",
-  plot.subtitle    = element_text(size = 16),
-  plot.caption     = element_text(size = 14),
-  strip.text       = element_text(size = 16),
-  legend.text      = element_text(size = 16),
-  legend.title     = element_text(size = 16),
-  axis.text        = element_text(size = 14),
-  axis.title       = element_text(size = 16)
+  panel.spacing         = unit(2, "lines"),
+  panel.border          = element_rect(linewidth = 0.5, fill = NA),
+  axis.ticks            = element_line(linewidth = 0.4),
+  axis.line             = element_blank(),
+  strip.background      = element_blank(),
+  plot.title            = element_text(size = 16),
+  plot.title.position   = "plot",
+  plot.subtitle         = element_text(size = 16),
+  plot.caption          = element_textbox(size = 12, width = 1),
+  plot.caption.position = "plot",
+  strip.text            = element_text(size = 16),
+  legend.text           = element_text(size = 16),
+  legend.title          = element_text(size = 16),
+  axis.text             = element_text(size = 14),
+  axis.title            = element_text(size = 16)
 )
 theme_set(theme_kamil)
 
@@ -124,12 +148,6 @@ option_list <- list(
 )
 opt <- parse_args(OptionParser(option_list = option_list))
 
-# opt$out <- "output"
-# opt$barcodes <- "out2/barcodes.txt"
-# opt$file <- "/projects/irae_blood/cellranger_output/C1_CD45A_gex/molecule_info.h5"
-# opt$file <- "/projects/irae_blood/cellranger_output/C1_CD45A_tcr/all_contig_annotations.csv"
-# opt$file <- "/projects/irae_blood/cellranger_output/irHepatitis_Batch_1A_ADT/irHepatitis_Batch_1A_ADT.stat.csv.gz"
-
 if (!dir.exists(opt$out)) {
   dir.create(opt$out, recursive = TRUE, showWarnings = FALSE)
 }
@@ -139,7 +157,6 @@ if (!file.exists(opt$file)) {
 }
 file_base <- basename(opt$file)
 file_dir <- basename(dirname(opt$file))
-file_dir <- str_remove(file_dir, "^irHepatitis_") # TODO: Delete this line
 accepted_files <- c(
   "GEX" = "^molecule_info.h5$",
   "VDJ" = "^all_contig_annotations.csv$",
@@ -202,7 +219,7 @@ if (type == "GEX") {
   status(glue("Writing {sat_file}"))
   fwrite(sat, sat_file, sep = "\t")
 
-  my_caption <- glue("{signif(100 * total_sat, 2)}% saturation ({signif(mean(gex_reads[keep]), 2)} reads per UMI)")
+  my_caption <- glue("{signif(100 * total_sat, 3)}% saturation ({signif(mean(gex_reads[keep]), 3)} reads per UMI)")
   p <- ggplot(sat) +
     aes(x = total_reads, y = sat) +
     geom_hline(yintercept = total_sat, linewidth = 0.3, color = "red") +
@@ -236,7 +253,7 @@ if (type == "GEX") {
     d_vdj$barcode <- str_remove(d_vdj$barcode, "-1$")
   }
 
-  my_probs <- c(10 ^ seq(-6, -1, by = 0.5), seq(0.2, 1, length.out = 10))
+  my_probs <- c(10 ^ seq(-4, -1, by = 0.5), seq(0.2, 1, length.out = 10))
 
   if (!is.null(barcodes)) {
     keep <- which(d_vdj$barcode %in% barcodes)
@@ -250,7 +267,10 @@ if (type == "GEX") {
   status(glue("Writing {sat_file}"))
   fwrite(sat, sat_file, sep = "\t")
 
-  my_caption <- glue("{signif(100 * total_sat, 2)}% saturation ({signif(mean(d_vdj$reads[keep]), 2)} reads per clonotype)")
+  reads_per_umi <- mean(d_vdj$reads[keep] / d_vdj$umis[keep])
+  reads_per_clonotype <- mean(d_vdj$reads[keep])
+
+  my_caption <- glue("{signif(100 * total_sat, 3)}% saturation ({signif(reads_per_clonotype, 3)} reads per clonotype, {signif(reads_per_umi, 3)} reads per UMI)")
   p <- ggplot(sat) +
     aes(x = total_reads, y = sat) +
     geom_hline(yintercept = total_sat, linewidth = 0.3, color = "red") +
@@ -347,7 +367,7 @@ if (type == "GEX") {
   status(glue("Writing {sat_file}"))
   fwrite(sat, sat_file, sep = "\t")
 
-  my_caption <- glue("{signif(100 * total_sat, 2)}% saturation ({signif(mean(d_adt$Count[keep]), 2)} reads per UMI)")
+  my_caption <- glue("{signif(100 * total_sat, 3)}% saturation ({signif(mean(d_adt$Count[keep]), 3)} reads per UMI)")
   p <- ggplot(sat) +
     aes(x = total_reads, y = sat) +
     geom_hline(yintercept = total_sat, linewidth = 0.3, color = "red") +

@@ -33,7 +33,7 @@ Install the dependencies:
 
 ```r
 install.packages(
-  c("data.table", "ggplot2", "glue", "optparse", "pbapply", "scales", "stringr", "BiocManager")
+  c("data.table", "ggplot2", "ggtext", "glue", "optparse", "pbapply", "scales", "stringr", "BiocManager")
 )
 BiocManager::install("rhdf5")
 ```
@@ -98,4 +98,19 @@ Writing output/histogram-saturation-adt-feature.pdf
 <img width="50%" src="https://user-images.githubusercontent.com/209714/224153734-6fe76c17-0aef-487c-8e3f-de70a1540c86.png">
 <img width="50%" src="https://user-images.githubusercontent.com/209714/224153888-63613f19-0840-4d79-8a2f-5ebca0ffafb3.png">
 </p>
+
+
+## Running parallel jobs with rush
+
+Install [rush](https://github.com/shenwei356/rush) by Wei Shen:
+
+```bash
+go install github.com/shenwei356/rush
+```
+
+ls /projects/irae_blood/cellranger_output/*/{molecule_info.h5,all_contig_annotations.csv,*.stat.csv.gz} > files.txt
+
+rush -i files.txt -o rush-saturation.txt -j16 'Rscript saturation.R --out irae_blood/{/%} --file {}'
+
+
 
