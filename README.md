@@ -89,7 +89,7 @@ Writing output/tcr/total_reads-vs-saturation-vdj.pdf
 ```
 
 <p align="center">
-<img width="50%" src="https://user-images.githubusercontent.com/209714/224188379-cba4664a-cc5d-4f49-a03f-9496cf77522a.png">
+<img width="50%" src="https://user-images.githubusercontent.com/209714/225680974-4607e8df-9925-486d-ba00-4aebe51da22f.png">
 </p>
 
 ### ADT
