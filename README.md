@@ -2,6 +2,17 @@
 
 <a href="https://zenodo.org/badge/latestdoi/611932244"><img src="https://zenodo.org/badge/611932244.svg" alt="DOI"></a>
 
+Table of contents:
+* [Introduction](#introduction)
+* [Getting started](#getting-started)
+* [Usage examples](#usage-examples)
+  * [GEX](#gex)
+  * [VDJ](#vdj)
+  * [ADT](#adt)
+* [Running parallel jobs with rush](#running-parallel-jobs-with-rush)
+
+## Introduction
+
 Here is an R script `saturation.R` for estimating sequencing saturation from a
 GEX, VDJ, or ADT dataset from the 10x Genomics platform.
 
@@ -114,6 +125,7 @@ Then make a list of input files and pass it to rush:
 ```bash
 ls /project/cellranger_output/*/{molecule_info.h5,all_contig_annotations.csv,*.stat.csv.gz} > files.txt
 
+# Run 16 jobs in parallel, capture outputs from each job in one file
 rush -i files.txt -o rush-saturation.txt -j16 'Rscript saturation.R --out out/{/%} --file {}'
 ```
 
