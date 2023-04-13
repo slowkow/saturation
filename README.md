@@ -28,6 +28,19 @@ Sequencing Saturation = 1 - (n_deduped_reads / n_reads)
 
 [1]: https://kb.10xgenomics.com/hc/en-us/articles/115003646912
 
+Here is my illustration of the relationship between sequencing saturation and reads per [unique molecular identifier](https://dnatech.genomecenter.ucdavis.edu/faqs/what-are-umis-and-why-are-they-used-in-high-throughput-sequencing/) (UMI):
+
+<p align="center">
+<img width="50%" src="https://user-images.githubusercontent.com/209714/231836618-a6cb746b-be7f-4605-8c84-c419cf48aab6.png">
+</p>
+
+We can compute reads per UMI from the saturation, and vice versa:
+
+```r
+d <- data.frame(sat = seq(0, 1, length.out = 1001))
+d$rpu <- 1 / (1 - d$sat)
+```
+
 Learn more about sequencing saturation from the 10xgenomics.com documentation:
 
 - [What is sequencing saturation?](https://kb.10xgenomics.com/hc/en-us/articles/115005062366)
